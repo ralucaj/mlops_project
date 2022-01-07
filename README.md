@@ -15,7 +15,7 @@ Our model will follow the vision transforms architecture proposed by
 To implement and train this model architecture, we will be using the built-in `VisionTransformer` class from
 [Kornia](https://kornia.readthedocs.io/en/latest/index.html), 
 a differentiable computer vision library for PyTorch.
-We will be training on the [ISIC challenge dataset](https://www.kaggle.com/c/siim-isic-melanoma-classification/data), a
+We will be training on the [512x512] resized [ISIC challenge dataset](https://www.kaggle.com/cdeotte/jpeg-melanoma-512x512), a
 collection of ~33.000 training and ~11.000 validation dermoscopy images, annotated by expert dermatologists as malignant
 (cancerous) or benign (non-cancerous).
 
