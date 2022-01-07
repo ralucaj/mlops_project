@@ -1,7 +1,23 @@
-Melanoma Classification
+Melanoma Classification Using Vision Transformers
 ==============================
+Skin cancer is one of the most common types of cancer worldwide, with over 1.000.000 diagnoses in 2018.
+Early detection is crucial for increasing the patient survival rate.
+In 2017, [Esteva et al.](https://www.nature.com/articles/nature21056) first applied a deep learning method to the 
+task of skin cancer classification, reaching near-expert diagnosis performance.
+However, one challenge that deep learning faces is the lack of reproducibility.
 
-Repository for the project of the course "02476 - Machine Learning Operations"
+In this project, we will develop a reproducible deep learning pipeline for training a skin cancer classification model.
+The pipeline will follow MLOps good practices, with a focus on reproducibility, code quality, continuous integration and 
+continuous development, scalability, and monitoring.
+
+Our model will follow the vision transforms architecture proposed by 
+[Dosovitskiy et al.](https://iclr.cc/virtual/2021/poster/3013).
+To implement and train this model architecture, we will be using the built-in `VisionTransformer` class from
+[Kornia](https://kornia.readthedocs.io/en/latest/index.html), 
+a differentiable computer vision library for PyTorch.
+We will be training on the [512x512] resized [ISIC challenge dataset](https://www.kaggle.com/cdeotte/jpeg-melanoma-512x512), a
+collection of ~33.000 training and ~11.000 validation dermoscopy images, annotated by expert dermatologists as malignant
+(cancerous) or benign (non-cancerous).
 
 Project Organization
 ------------
