@@ -11,6 +11,7 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 import logging
+
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
 
@@ -43,13 +44,14 @@ def train(cfg):
     )
     trainer = Trainer(
         max_epochs=cfg.training.epochs,
-        accelerator='gpu',
+        accelerator="gpu",
         gpus=1,
         limit_train_batches=cfg.training.limit_train_batches,
-        callbacks=[early_stopping_callback]
+        callbacks=[early_stopping_callback],
     )
-    trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=validation_loader)
-
+    trainer.fit(
+        model, train_dataloaders=train_loader, val_dataloaders=validation_loader
+    )
 
     # Save model
     torch.save(model.state_dict(), cfg.training.model_path)

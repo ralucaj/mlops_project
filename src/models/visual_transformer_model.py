@@ -17,15 +17,13 @@ class VisualTransformer(LightningModule):
             image_size=self.image_size,
             patch_size=self.patch_size,
             embed_dim=self.embed_dim,
-            num_heads=self.num_heads
+            num_heads=self.num_heads,
         )
         self.classification_head = K.contrib.ClassificationHead(
-            embed_size=self.embed_dim,
-            num_classes=self.num_classes
+            embed_size=self.embed_dim, num_classes=self.num_classes
         )
         self.classifier = nn.Sequential(
-            self.vision_transformer,
-            self.classification_head
+            self.vision_transformer, self.classification_head
         )
 
         self.criterion = nn.CrossEntropyLoss()
@@ -41,14 +39,14 @@ class VisualTransformer(LightningModule):
         data, target = batch
         preds = self.forward(data)
         loss = self.criterion(preds, target)
-        self.log('loss', loss)
+        self.log("loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         data, target = batch
         preds = self.forward(data)
         loss = self.criterion(preds, target)
-        self.log('valid_loss', loss)
+        self.log("valid_loss", loss)
         return loss
 
     def configure_optimizers(self):
