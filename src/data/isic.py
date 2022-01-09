@@ -13,8 +13,8 @@ class ISIC(Dataset):
         label_map,
         class_map,
         image_dir="data/processed/images",
-        filename_col='image_name',
-        label_col='benign_malignant',
+        filename_col="image_name",
+        label_col="benign_malignant",
         transforms=None,
     ):
         """
@@ -59,7 +59,6 @@ class ISIC(Dataset):
         if isinstance(transforms, list):
             transforms = T.Compose(transforms)
         self.transforms = transforms
-
 
     def __len__(self):
         return len(self.label_map)
