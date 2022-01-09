@@ -29,6 +29,10 @@ Before running `make data` you will need to authenticate your used in the Kaggle
 'Create API Token'. This will trigger the download of `kaggle.json`, a file containing your API credentials. 
 3. Place this file in `~/.kaggle/kaggle.json` and change the permissions by running `chmod 600 ~/.kaggle/kaggle.json`.
 
+Project requirements
+-----------
+Requires `python >= 3.8` to run.
+
 Project Organization
 ------------
 

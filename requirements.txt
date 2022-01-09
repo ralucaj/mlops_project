@@ -16,3 +16,7 @@ pyyaml
 kaggle
 isort
 black
+kornia
+hydra
+hydra-core
+matplotlib
