@@ -13,3 +13,4 @@ torchvision
 pytorch_lightning
 pandas
 pyyaml
+kaggle

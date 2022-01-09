@@ -19,6 +19,16 @@ We will be training on the [512x512] resized [ISIC challenge dataset](https://ww
 collection of ~33.000 training and ~11.000 validation dermoscopy images, annotated by expert dermatologists as malignant
 (cancerous) or benign (non-cancerous).
 
+Required Credentials
+------------
+To download the ISIC data, we will be using the `kaggle` CLI. 
+Before running `make data` you will need to authenticate your used in the Kaggle, as instructed in the
+[official Kaggle API documentation](https://github.com/Kaggle/kaggle-api):
+1. Create a Kaggle account.
+2. Go to the 'Account' tab of your [user profile](https://www.kaggle.com/<username>/account) and select 
+'Create API Token'. This will trigger the download of `kaggle.json`, a file containing your API credentials. 
+3. Place this file in `~/.kaggle/kaggle.json` and change the permissions by running `chmod 600 ~/.kaggle/kaggle.json`.
+
 Project Organization
 ------------
 
