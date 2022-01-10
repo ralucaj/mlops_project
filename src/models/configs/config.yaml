@@ -1,8 +1,5 @@
 data:
-  train_label_map_path: "/mnt/c/Users/raluca/Documents/source/mlops_project/data/processed/train.csv"
-  valid_label_map_path: "/mnt/c/Users/raluca/Documents/source/mlops_project/data/processed/valid.csv"
   class_map: {"benign": 0, "malignant": 1}
-  image_dir: "/mnt/c/Users/raluca/Documents/source/mlops_project/data/processed/images"
   filename_col: "image_name"
   label_col: "benign_malignant"
 
