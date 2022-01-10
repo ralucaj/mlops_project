@@ -9,29 +9,35 @@ from torch import nn, optim
 import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+import pdb
 
 import logging
+import os
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
 
+# Loading realtive directories
+train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
+valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
+image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def train(cfg):
     print("Training day and night")
     model = VisualTransformer(cfg.model)
     train_dataset = ISIC(
-        cfg.data.train_label_map_path,
+        train_label_map_path,
         cfg.data.class_map,
-        image_dir=cfg.data.image_dir,
+        image_dir,
         filename_col=cfg.data.filename_col,
         label_col=cfg.data.label_col,
         transforms=None,
     )
     valid_dataset = ISIC(
-        cfg.data.valid_label_map_path,
+        valid_label_map_path,
         cfg.data.class_map,
-        image_dir=cfg.data.image_dir,
+        image_dir,
         filename_col=cfg.data.filename_col,
         label_col=cfg.data.label_col,
         transforms=None,
@@ -44,8 +50,8 @@ def train(cfg):
     )
     trainer = Trainer(
         max_epochs=cfg.training.epochs,
-        accelerator="gpu",
-        gpus=1,
+        accelerator="auto",
+        #gpus=1,
         limit_train_batches=cfg.training.limit_train_batches,
         callbacks=[early_stopping_callback],
     )
