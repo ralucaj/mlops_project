@@ -10,6 +10,7 @@ import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pdb
+from pytorch_lightning.loggers import WandbLogger 
 
 import logging
 import os
@@ -24,6 +25,7 @@ image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def train(cfg):
+    wandb_logger = WandbLogger()
     print("Training day and night")
     model = VisualTransformer(cfg.model)
     train_dataset = ISIC(
@@ -51,9 +53,10 @@ def train(cfg):
     trainer = Trainer(
         max_epochs=cfg.training.epochs,
         accelerator="auto",
-        #gpus=1,
+        gpus=None,
         limit_train_batches=cfg.training.limit_train_batches,
         callbacks=[early_stopping_callback],
+        logger=wandb_logger
     )
     trainer.fit(
         model, train_dataloaders=train_loader, val_dataloaders=validation_loader
