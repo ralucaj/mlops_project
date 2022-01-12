@@ -8,11 +8,12 @@ import shutil
 import os
 import numpy as np
 import zipfile
+import pdb
 
 
 @click.command()
 @click.argument("kaggle_dataset")
-@click.argument("input_filepath", type=click.Path(exists=True))
+@click.argument("input_filepath", type=click.Path())
 @click.argument("output_filepath", type=click.Path())
 def main(kaggle_dataset, input_filepath, output_filepath):
     """
@@ -24,8 +25,18 @@ def main(kaggle_dataset, input_filepath, output_filepath):
     :param output_filepath: location where the processed data will be stored
     """
     logger = logging.getLogger(__name__)
+    # Check and create directories if missing
+    input_filepath_full = os.path.abspath(os.path.join(os.getcwd(), input_filepath.split('/')[0], input_filepath.split('/')[1])) 
+    if not os.path.exists(input_filepath_full):
+        logger.info(f"Path {input_filepath} not found, creating it now")
+        os.makedirs(input_filepath_full)
+    
+    output_filepath_full = os.path.abspath(os.path.join(os.getcwd(), output_filepath.split('/')[0], output_filepath.split('/')[1])) 
+    if not os.path.exists(output_filepath_full):
+        logger.info(f"Path {output_filepath} not found, creating it now")
+        os.makedirs(output_filepath_full)
 
-    logger.info(f"downloading dataset from {kaggle_dataset}")
+    logger.info(f"Downloading dataset from {kaggle_dataset}")
     os.system(f"kaggle datasets download {kaggle_dataset} -p {input_filepath}")
 
     dataset_name = kaggle_dataset.split("/")[1]
