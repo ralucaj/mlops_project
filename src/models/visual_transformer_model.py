@@ -36,6 +36,16 @@ class VisualTransformer(LightningModule):
         return x
 
     def training_step(self, batch, batch_idx):
+        """
+        Perform a training iteration.
+
+        Args:
+            batch (tensor): input data batch of size [batch_size, 512, 512]
+            batch_idx ([type]): [description]
+
+        Returns:
+            loss (tensor): array of losses for the particular input batch
+        """
         data, target = batch
         preds = self.forward(data)
         loss = self.criterion(preds, target)
@@ -43,6 +53,16 @@ class VisualTransformer(LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
+        """
+        Perform a validation iteration.
+
+        Args:
+            batch (tensor): input data batch of size [batch_size, 512, 512]
+            batch_idx ([type]): [description]
+
+        Returns:
+            loss (tensor): array of losses for the particular input batch
+        """
         data, target = batch
         preds = self.forward(data)
         loss = self.criterion(preds, target)

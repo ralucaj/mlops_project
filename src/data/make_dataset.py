@@ -17,12 +17,13 @@ import pdb
 @click.argument("output_filepath", type=click.Path())
 def main(kaggle_dataset, input_filepath, output_filepath):
     """
-    Runs data processing scripts to turn raw data from (../raw) into cleaned data ready to be analyzed (saved in
-    ../processed).
-
-    :param kaggle_dataset: kaggle dataset id, in the format [UserName/DatasetName]
-    :param input_filepath: location where the raw data is stored
-    :param output_filepath: location where the processed data will be stored
+        Prepares the datasets. Download and process raw data from
+        (./data/raw) into cleaned ready preprocessed (.data/processed).
+        
+    Args:
+        kaggle_dataset (string): kaggle dataset id, in the format [UserName/DatasetName]
+        input_filepath (string): location where the raw data is stored
+        output_filepath (string): location where the processed data will be stored
     """
     logger = logging.getLogger(__name__)
     # Check and create directories if missing

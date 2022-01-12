@@ -25,7 +25,11 @@ image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
 @hydra.main(config_path="configs", config_name="config.yaml")
 def train(cfg):
     print("Training day and night")
+    
+    # Specify model
     model = VisualTransformer(cfg.model)
+    
+    # Fetch dataset for training
     train_dataset = ISIC(
         train_label_map_path,
         cfg.data.class_map,
@@ -34,6 +38,8 @@ def train(cfg):
         label_col=cfg.data.label_col,
         transforms=None,
     )
+    
+    # Fetch dataset for validation
     valid_dataset = ISIC(
         valid_label_map_path,
         cfg.data.class_map,
@@ -42,12 +48,17 @@ def train(cfg):
         label_col=cfg.data.label_col,
         transforms=None,
     )
+    
+    # Create train/validation dataloaders
     train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size)
     validation_loader = DataLoader(valid_dataset, batch_size=cfg.training.batch_size)
 
+    # Initialize early stopping
     early_stopping_callback = EarlyStopping(
         monitor="valid_loss", patience=10, verbose=True, mode="min"
     )
+    
+    # Initialize model trainer
     trainer = Trainer(
         max_epochs=cfg.training.epochs,
         accelerator="auto",
@@ -55,11 +66,13 @@ def train(cfg):
         limit_train_batches=cfg.training.limit_train_batches,
         callbacks=[early_stopping_callback],
     )
+    
+    # Train model (with simultaneous validation)
     trainer.fit(
         model, train_dataloaders=train_loader, val_dataloaders=validation_loader
     )
 
-    # Save model
+    # Save trained model
     torch.save(model.state_dict(), cfg.training.model_path)
 
 
