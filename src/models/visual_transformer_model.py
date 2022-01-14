@@ -1,7 +1,9 @@
+import os
 import torch.nn.functional as F
 from torch import nn, optim
 from pytorch_lightning import LightningModule
 import kornia as K
+from torch.profiler import profile, record_function, ProfilerActivity, tensorboard_trace_handler
 
 
 class VisualTransformer(LightningModule):
@@ -32,7 +34,15 @@ class VisualTransformer(LightningModule):
     def forward(self, x):
         # make sure input tensor is flattened
         x = self.classifier(x)
-
+        '''
+        # Profile Tracking (uncomment and use with debug breakpoint at `return x`)
+        with profile(activities=[ProfilerActivity.CPU],
+                    record_shapes=True,
+                    on_trace_ready=tensorboard_trace_handler(os.getcwd())) as prof:
+            with record_function("model_inference"):
+                # make sure input tensor is flattened
+                x = self.classifier(x)
+        '''
         return x
 
     def training_step(self, batch, batch_idx):

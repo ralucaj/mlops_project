@@ -91,3 +91,6 @@ target/
 # Hydra
 outputs/
 models/
+
+# Profiler
+*.prof
