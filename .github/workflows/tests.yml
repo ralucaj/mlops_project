@@ -2,9 +2,13 @@ name: "Run tests"
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - update/add_CI_CD
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - update/add_CI_CD
 
 jobs:
   build:
