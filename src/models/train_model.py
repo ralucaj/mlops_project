@@ -79,17 +79,23 @@ def train(cfg):
     subprocess.check_call(['gsutil', 'cp', model_path_docker, model_path_bucket])
 
 if __name__ == "__main__":
-    # Loading realtive directories
+
+    # Create directory to store the downloaded data
+    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data/processed')) #'root/data/processed'
+    # if not os.path.exists(destination_path):
+    #     os.makedirs(destination_path)
+    # print("Created directory: {0}".format(destination_path))
+    # Download data from cloud storage bucket
+    bucket_name = 'gs://raw-dataset/processed'
+    subprocess.check_call(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
+
+    # Define train/test/images map paths
     train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
     valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
     image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
     experiment_time = time.strftime("%Y%m%d-%H%M%S")
 
-    # Download data from cloud storage bucket
-    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data/processed')) #'root/data/processed'
-    os.makedirs(destination_path)
-    bucket_name = 'gs://raw-dataset/processed'
-    subprocess.check_call(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
+    
 
     # Train model
     train()
