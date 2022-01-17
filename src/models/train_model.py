@@ -27,7 +27,10 @@ def train(cfg):
     
     # Specify model
     model = VisualTransformer(cfg.model)
-    
+    # Distributed training if we have more than 1 GPU available
+    if torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model, device_ids=range(torch.cuda.device_count()))
+
     # Fetch dataset for training
     train_dataset = ISIC(
         train_label_map_path,
