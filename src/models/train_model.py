@@ -81,5 +81,8 @@ def train(cfg):
     # Save trained model
     torch.save(model.state_dict(), cfg.training.model_path)
 
+    # Save quantized model
+    model_int8 = torch.quantization.quantize_dynamic(model)
+    torch.save(model_int8.state_dict(), cfg.training.quantized_model_path)
 
 train()
