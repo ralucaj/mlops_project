@@ -17,7 +17,7 @@ COPY data/processed.dvc /root/data/processed.dvc
 
 # Install requirements
 RUN pip install -r requirements.txt --no-cache-dir
-RUN pip install --upgrade google-cloud-storage
+# RUN pip install --upgrade google-cloud-storage
 # RUN pip install dvc
 # RUN pip install dvc[gs]
 
