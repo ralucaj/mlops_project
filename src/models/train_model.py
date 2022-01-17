@@ -81,6 +81,16 @@ def train(cfg):
     # Save trained model
     torch.save(model.state_dict(), cfg.training.model_path)
 
+    # Save deployable model
+    script_model = torch.jit.trace(
+        model,
+        torch.rand(1, 3, cfg.model.image_size, cfg.model.image_size)
+    )
+    deployable_model_path = os.path.abspath(
+        os.path.join(os.getcwd(), cfg.training.deployable_model_path)
+    )
+    script_model.save(deployable_model_path)
+
     # Save quantized model
     model_int8 = torch.quantization.quantize_dynamic(model)
     torch.save(model_int8.state_dict(), cfg.training.quantized_model_path)
