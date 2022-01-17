@@ -17,8 +17,9 @@ COPY data/processed.dvc /root/data/processed.dvc
 
 # Install requirements
 RUN pip install -r requirements.txt --no-cache-dir
-RUN pip install dvc
-RUN pip install dvc[gs]
+RUN pip install --upgrade google-cloud-storage
+# RUN pip install dvc
+# RUN pip install dvc[gs]
 
 # Installs google cloud sdk, this is mostly for using gsutil to export model.
 RUN wget -nv \
@@ -41,7 +42,7 @@ RUN echo '[GoogleCompute]\nservice_account = default' > /etc/boto.cfg
 
 # create data folder?
 # pull data from the cloud
-RUN dvc pull
+# RUN dvc pull
 RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models

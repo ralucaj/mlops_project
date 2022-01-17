@@ -8,7 +8,7 @@ training:
   epochs: 1
   seed: 42
   limit_train_batches: 0.2
-  model_path: "trained_model.pt"
+  model_path: "trained_model"
 
 model:
   image_size: 512

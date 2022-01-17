@@ -10,17 +10,15 @@ import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pdb
+import subprocess
 
 import logging
 import os
+import time
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
-
-# Loading realtive directories
-train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
-valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
-image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
+from src.data.download_data import download_blob
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def train(cfg):
@@ -72,8 +70,29 @@ def train(cfg):
         model, train_dataloaders=train_loader, val_dataloaders=validation_loader
     )
 
+    model_name = cfg.training.model_path + '_' + experiment_time + '.pt'
+    model_path_docker = os.path.join('/models', model_name)
     # Save trained model
-    torch.save(model.state_dict(), cfg.training.model_path)
+    torch.save(model.state_dict(), model_path_docker)
 
+    bucket_name = 'gs://melanoma-classification-models'
+    model_path_bucket = os.path.join(bucket_name, 'trained_models', model_name)
+    subprocess.check_call(['gsutil', 'cp', model_path_docker, model_path_bucket])
 
-train()
+if __name__ == "__main__":
+    # Loading realtive directories
+    train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
+    valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
+    image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
+    experiment_time = time.strftime("%Y%m%d-%H%M%S")
+
+    # Download data from cloud storage bucket
+    destination_path = 'data/processed' #'root/data/processed'
+    os.makedirs(destination_path)
+    bucket_name = 'gs://raw-dataset/processed'
+    source_folder = '/processed'
+    # download_blob(bucket_name=bucket_name, source_blob_name=source_folder, destination_file_name=destination_path)
+    subprocess.check_call(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
+
+    # Train model
+    train()
