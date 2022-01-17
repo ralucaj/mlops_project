@@ -50,8 +50,15 @@ def train(cfg):
     )
     
     # Create train/validation dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size)
-    validation_loader = DataLoader(valid_dataset, batch_size=cfg.training.batch_size)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers
+    )
+    validation_loader = DataLoader(
+        valid_dataset,
+        batch_size=cfg.training.batch_size,
+    )
 
     # Initialize early stopping
     early_stopping_callback = EarlyStopping(
