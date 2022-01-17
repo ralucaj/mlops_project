@@ -9,6 +9,7 @@ training:
   seed: 42
   limit_train_batches: 0.2
   model_path: "trained_model.pt"
+  num_workers: 8
 
 model:
   image_size: 512

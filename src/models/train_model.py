@@ -1,18 +1,17 @@
+import logging
+import os
+import pdb
+
+import hydra
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
-
-from visual_transformer_model import VisualTransformer
-from torch import nn, optim
-import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-import pdb
-
-import logging
-import os
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from visual_transformer_model import VisualTransformer
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
@@ -50,8 +49,15 @@ def train(cfg):
     )
     
     # Create train/validation dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size)
-    validation_loader = DataLoader(valid_dataset, batch_size=cfg.training.batch_size)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers
+    )
+    validation_loader = DataLoader(
+        valid_dataset,
+        batch_size=cfg.training.batch_size,
+    )
 
     # Initialize early stopping
     early_stopping_callback = EarlyStopping(
