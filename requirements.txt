@@ -22,3 +22,4 @@ hydra-core
 matplotlib
 snakeviz
 torch_tb_profiler
+pytest
