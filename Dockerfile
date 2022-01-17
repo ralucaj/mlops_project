@@ -46,8 +46,8 @@ RUN echo '[GoogleCompute]\nservice_account = default' > /etc/boto.cfg
 RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models
-RUN mkdir /root/data
-RUN mkdir /root/data/processed
+# RUN mkdir /root/data
+# RUN mkdir /root/data/processed
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
