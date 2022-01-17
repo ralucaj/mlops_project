@@ -4,7 +4,7 @@
 REGION=us-central1
 
 # Define image URI
-IMAGE_URI=gcr.io/dtumlops-338009/testing:latest
+IMAGE_URI=gcr.io/mlops-project-skin-cancer/training_images:latest
 
 # Define unique job name
 JOB_NAME=model_training_job_$(date +%Y%m%d_%H%M%S)
