@@ -1,18 +1,17 @@
+import logging
+import os
+import pdb
+
+import hydra
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
-
-from visual_transformer_model import VisualTransformer
-from torch import nn, optim
-import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-import pdb
-
-import logging
-import os
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from visual_transformer_model import VisualTransformer
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
