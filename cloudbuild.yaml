@@ -3,3 +3,4 @@ steps:
   args: ['build', '-t', 'gcr.io/mlops-project-skin-cancer/training_images', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/mlops-project-skin-cancer/training_images']
+timeout: '1600s'
