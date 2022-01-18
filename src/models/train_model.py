@@ -11,6 +11,8 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pdb
 import subprocess
+import argparse
+from omegaconf import OmegaConf
 
 import logging
 import os
@@ -18,14 +20,59 @@ import time
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
-from src.data.download_data import download_blob
 
-@hydra.main(config_path="configs", config_name="config.yaml")
-def train(cfg):
-    print("Training day and night")
+def get_args():
+    """Argument parser.
+    Returns:
+    Dictionary of arguments.
+    """
+    parser = argparse.ArgumentParser(description='Melanoma classification model parameters')
+    parser.add_argument(
+        '--lr',
+        type=float,
+        default=0.01,
+        metavar='LR',
+        help='Learning rate')
+
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        default=32,
+        metavar='N',
+        help='Input batch size for training')
+
+    parser.add_argument(
+        '--epochs',
+        type=int,
+        default=10,
+        metavar='N',
+        help='Number of epoch to train')
+
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=42,
+        metavar='S',
+        help='Random seed')
     
+    parser.add_argument(
+        '--limit_train_batches',
+        type=float,
+        default=0.2,
+        metavar='LB',
+        help='Limit train batches')
+    
+    args = parser.parse_args()
+    return args
+
+    
+
+# @hydra.main(config_path="configs", config_name="config.yaml")
+def train(cfg, args):
+    print("Training day and night")
+
     # Specify model
-    model = VisualTransformer(cfg.model)
+    model = VisualTransformer(cfg.model, args.lr)
     
     # Fetch dataset for training
     train_dataset = ISIC(
@@ -48,8 +95,8 @@ def train(cfg):
     )
     
     # Create train/validation dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size)
-    validation_loader = DataLoader(valid_dataset, batch_size=cfg.training.batch_size)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
+    validation_loader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
     # Initialize early stopping
     early_stopping_callback = EarlyStopping(
@@ -58,19 +105,19 @@ def train(cfg):
     
     # Initialize model trainer
     trainer = Trainer(
-        max_epochs=cfg.training.epochs,
+        max_epochs=args.epochs,
         accelerator="auto",
         #gpus=1,
-        limit_train_batches=cfg.training.limit_train_batches,
+        limit_train_batches=args.limit_train_batches,
         callbacks=[early_stopping_callback],
     )
-    
+
     # Train model (with simultaneous validation)
     trainer.fit(
         model, train_dataloaders=train_loader, val_dataloaders=validation_loader
     )
 
-    model_name = cfg.training.model_path + '_' + experiment_time + '.pt'
+    model_name = cfg.model.model_path + '_' + experiment_time + '.pt'
     model_path_docker = os.path.join(models_dir_path, model_name)
     print("Model path docker: {0}".format(model_path_docker))
     # Save trained model
@@ -83,23 +130,29 @@ def train(cfg):
 
 if __name__ == "__main__":
 
+    args = get_args()
+    # pdb.set_trace()
     # Define data/train/test/images map paths
     destination_path = os.path.abspath(os.path.join(os.getcwd(),'data'))
     train_label_map_path = os.path.join(destination_path, 'processed', 'train.csv')
     valid_label_map_path = os.path.join(destination_path, 'processed', 'valid.csv')
     image_dir = os.path.join(destination_path,'processed', 'images')
     models_dir_path = os.path.abspath(os.path.join(os.getcwd(),'models'))
+    config_path = os.path.abspath(os.path.join(os.getcwd(), 'src', 'models', 'configs', 'config.yaml'))
     experiment_time = time.strftime("%Y%m%d-%H%M%S")
-
-    print("Models dir {0}".format(models_dir_path))
 
     # Google Cloud bucket name 
     bucket_name = 'gs://raw-dataset/processed'
 
-    # Download data from cloud storage bucket
-    command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
-    os.system(command)
-    print(os.listdir(os.path.join(destination_path, 'processed')))
+    if not os.listdir(destination_path):
+        print("Data directory empty, downloading the data...")
+        # Download data from cloud storage bucket
+        command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
+        os.system(command)
+        #print(os.listdir(os.path.join(destination_path, 'processed')))
+    else:
+        print("Data already stored.")
 
+    cfg = OmegaConf.load(config_path)
     # Train model
-    train()
+    train(cfg, args)

@@ -3,17 +3,11 @@ data:
   filename_col: "image_name"
   label_col: "benign_malignant"
 
-training:
-  batch_size: 32
-  epochs: 1
-  seed: 42
-  limit_train_batches: 0.2
-  model_path: "trained_model"
-
 model:
   image_size: 512
   patch_size: 64
   embed_dim: 128
   num_heads: 3
   num_classes: 2
-  lr: 1e-3
+  model_path: "trained_model"
+  

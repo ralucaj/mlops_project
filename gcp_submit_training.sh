@@ -12,4 +12,8 @@ JOB_NAME=model_training_job_$(date +%Y%m%d_%H%M%S)
 # Submit job to AI- Platform
 gcloud ai-platform jobs submit training $JOB_NAME \
   --region $REGION \
-  --master-image-uri $IMAGE_URI 
+  --master-image-uri $IMAGE_URI \
+  --lr 0.02 \
+  --batch_size 64 \
+  --epochs 10 \
+  --seed 32
