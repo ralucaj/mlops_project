@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # destination_path =  '/tmp' #'root/data/processed'
     # # print("Created directory: {0}".format(destination_path))
     # # Download data from cloud storage bucket
-    bucket_name = 'gs://raw-dataset/processed'
+    bucket_name = 'gs://raw-dataset'
     # download_blob(bucket_name=bucket_name, source_blob_name='/processed', destination_file_name=destination_path)
     # subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
     command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
