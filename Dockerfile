@@ -17,7 +17,7 @@ COPY src/ /root/src/
 
 # Install requirements
 RUN pip install -r requirements.txt --no-cache-dir
-# RUN pip install --upgrade google-cloud-storage
+RUN pip install --upgrade google-cloud-storage
 # RUN pip install dvc
 # RUN pip install dvc[gs]
 
@@ -47,8 +47,8 @@ RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models
 RUN mkdir /root/data
-RUN mkdir /root/data/processed
-RUN gsutil -m cp -r gs://raw-dataset/processed /root/data/processed
+# RUN mkdir /root/data/processed
+# RUN gsutil -m cp -r gs://raw-dataset/processed /root/data/processed
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]

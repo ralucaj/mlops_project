@@ -18,6 +18,7 @@ import time
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
+from src.data.download_data import download_blob
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def train(cfg):
@@ -81,12 +82,13 @@ def train(cfg):
 if __name__ == "__main__":
 
     # Create directory to store the downloaded data
-    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data/processed')) #'root/data/processed'
+    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data')) #'root/data/processed'
 
     # destination_path =  '/tmp' #'root/data/processed'
     # # print("Created directory: {0}".format(destination_path))
     # # Download data from cloud storage bucket
-    # bucket_name = 'gs://raw-dataset/processed'
+    bucket_name = 'gs://raw-dataset'
+    download_blob(bucket_name=bucket_name, source_blob_name='/processed', destination_file_name=destination_path)
     # subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
 
     # Define train/test/images map paths
