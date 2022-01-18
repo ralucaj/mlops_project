@@ -71,7 +71,7 @@ def train(cfg):
     )
 
     model_name = cfg.training.model_path + '_' + experiment_time + '.pt'
-    model_path_docker = os.path.join('/models', model_name)
+    model_path_docker = os.path.abspath(os.path.join(os.getcwd(),'models', model_name))
     # Save trained model
     torch.save(model.state_dict(), model_path_docker)
 
