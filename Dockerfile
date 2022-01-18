@@ -43,9 +43,9 @@ RUN mkdir /root/reports/figures
 RUN mkdir /root/models
 RUN mkdir /root/data
 
-ARG WANDB_API_KEY=local
-ENV WANDB_API_KEY ${WANDB_API_KEY}
-RUN chmod +x /root/wandb_login.sh && /root/wandb_login.sh
+ARG WANDB_API_KEY
+# ENV WANDB_API_KEY ${WANDB_API_KEY}
+RUN wandb login ${WANDB_API_KEY}
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
