@@ -6,6 +6,6 @@ steps:
   args: ['push', 'gcr.io/mlops-project-skin-cancer/training_images']
 availableSecrets:
   secretManager:
-  - versionName: projects/930242232300/secrets/wandb_api_key/versions/1
+  - versionName: projects/930242232300/secrets/wandb_api_key/versions/2
     env: 'API_KEY'
 timeout: '1600s'
