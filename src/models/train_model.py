@@ -81,21 +81,18 @@ def train(cfg):
 if __name__ == "__main__":
 
     # Create directory to store the downloaded data
-    # destination_path = os.path.abspath(os.path.join(os.getcwd(),'data/processed')) #'root/data/processed'
+    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data/processed')) #'root/data/processed'
 
-    destination_path =  '/tmp' #'root/data/processed'
-    # print("Created directory: {0}".format(destination_path))
-    # Download data from cloud storage bucket
-    bucket_name = 'gs://raw-dataset/processed'
-    subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
+    # destination_path =  '/tmp' #'root/data/processed'
+    # # print("Created directory: {0}".format(destination_path))
+    # # Download data from cloud storage bucket
+    # bucket_name = 'gs://raw-dataset/processed'
+    # subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
 
     # Define train/test/images map paths
-    # train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
-    # valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
-    # image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
-    train_label_map_path = os.path.join(destination_path, 'train.csv')
-    valid_label_map_path = os.path.join(destination_path, 'train.csv')
-    image_dir = os.path.join(destination_path, 'images')
+    train_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/train.csv'))
+    valid_label_map_path = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/valid.csv'))
+    image_dir = os.path.abspath(os.path.join(os.getcwd(), 'data/processed/images'))
     experiment_time = time.strftime("%Y%m%d-%H%M%S")
 
     
