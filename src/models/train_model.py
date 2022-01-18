@@ -90,7 +90,7 @@ if __name__ == "__main__":
     bucket_name = 'gs://raw-dataset/processed'
     # download_blob(bucket_name=bucket_name, source_blob_name='/processed', destination_file_name=destination_path)
     # subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
-    command = "gsutil -m cp -r gs://{bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
+    command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
     os.system(command)
 
     # Define train/test/images map paths
