@@ -47,8 +47,10 @@ RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models
 RUN mkdir /root/data
-# RUN mkdir /root/data/processed
-# RUN gsutil -m cp -r gs://raw-dataset/processed /root/data/processed
+
+ARG WANDB_API_KEY=local
+ENV WANDB_API_KEY ${WANDB_API_KEY}
+RUN wandb login $WANDB_API_KEY
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]

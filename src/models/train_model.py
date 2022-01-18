@@ -13,6 +13,7 @@ import pdb
 import subprocess
 import argparse
 from omegaconf import OmegaConf
+from pytorch_lightning.loggers import WandbLogger 
 
 import logging
 import os
@@ -71,6 +72,9 @@ def get_args():
 def train(cfg, args):
     print("Training day and night")
 
+    # Create wandb logger for Pytorch Lightning
+    wandb_logger = WandbLogger()
+
     # Specify model
     model = VisualTransformer(cfg.model, args.lr)
     
@@ -110,6 +114,7 @@ def train(cfg, args):
         #gpus=1,
         limit_train_batches=args.limit_train_batches,
         callbacks=[early_stopping_callback],
+        logger=wandb_logger
     )
 
     # Train model (with simultaneous validation)
