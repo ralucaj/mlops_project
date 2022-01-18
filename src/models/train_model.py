@@ -71,7 +71,8 @@ def train(cfg):
     )
 
     model_name = cfg.training.model_path + '_' + experiment_time + '.pt'
-    model_path_docker = os.path.abspath(os.path.join(os.getcwd(),'models', model_name))
+    model_path_docker = os.path.join(models_dir_path, model_name)
+    print("Model path docker: {0}".format(model_path_docker))
     # Save trained model
     torch.save(model.state_dict(), model_path_docker)
 
@@ -79,29 +80,26 @@ def train(cfg):
     model_path_bucket = os.path.join(bucket_name, 'trained_models', model_name)
     subprocess.check_call(['gsutil', 'cp', model_path_docker, model_path_bucket])
 
+
 if __name__ == "__main__":
 
-    # Create directory to store the downloaded data
-    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data')) #'root/data/processed'
-
-    # destination_path =  '/tmp' #'root/data/processed'
-    # # print("Created directory: {0}".format(destination_path))
-    # # Download data from cloud storage bucket
-    bucket_name = 'gs://raw-dataset/processed'
-    # download_blob(bucket_name=bucket_name, source_blob_name='/processed', destination_file_name=destination_path)
-    # subprocess.check_output(['gsutil', '-m', 'cp', '-r', bucket_name, destination_path])
-    command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
-    os.system(command)
-    print(os.listdir(os.path.join(destination_path, 'processed')))
-
-    # Define train/test/images map paths
+    # Define data/train/test/images map paths
+    destination_path = os.path.abspath(os.path.join(os.getcwd(),'data'))
     train_label_map_path = os.path.join(destination_path, 'processed', 'train.csv')
     valid_label_map_path = os.path.join(destination_path, 'processed', 'valid.csv')
     image_dir = os.path.join(destination_path,'processed', 'images')
-    # train_label_map_path = os.path.join(bucket_name, 'train.csv')
-    # valid_label_map_path = os.path.join(bucket_name, 'valid.csv')
-    # image_dir = os.path.join(bucket_name, 'images')
+    models_dir_path = os.path.abspath(os.path.join(os.getcwd(),'models'))
     experiment_time = time.strftime("%Y%m%d-%H%M%S")
+
+    print("Models dir {0}".format(models_dir_path))
+
+    # Google Cloud bucket name 
+    bucket_name = 'gs://raw-dataset/processed'
+
+    # Download data from cloud storage bucket
+    command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
+    os.system(command)
+    print(os.listdir(os.path.join(destination_path, 'processed')))
 
     # Train model
     train()
