@@ -23,3 +23,5 @@ matplotlib
 snakeviz
 torch_tb_profiler
 pytest
+torchserve
+torch-model-archiver

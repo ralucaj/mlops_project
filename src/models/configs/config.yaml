@@ -7,9 +7,10 @@ training:
   batch_size: 32
   epochs: 1
   seed: 42
-  limit_train_batches: 0.2
+  limit_train_batches: 0.1
   model_path: "trained_model.pt"
   quantized_model_path: "quantized_model.pt"
+  deployable_model_path: "deployable_model.pt"
   num_workers: 8
 
 model:
