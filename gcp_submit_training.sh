@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# wandb API key
+WANDB_KEY=$(gcloud secrets versions access 2 --secret="wandb_api_key")
 # Define region
 REGION=us-central1
 
@@ -17,4 +19,6 @@ gcloud ai-platform jobs submit training $JOB_NAME \
   --lr=0.02 \
   --batch_size=64 \
   --epochs=1 \
-  --seed=32
+  --seed=32 \
+  --wandb_key=$WANDB_KEY
+
