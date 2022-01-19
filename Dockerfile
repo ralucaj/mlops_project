@@ -43,9 +43,9 @@ RUN mkdir /root/reports/figures
 RUN mkdir /root/models
 RUN mkdir /root/data
 
-ARG WANDB_API_KEY
-ENV WANDB_API_KEY ${WANDB_API_KEY}
-RUN wandb login $(gcloud secrets versions access 1 --secret="wandb_api_key")
+# ARG WANDB_API_KEY
+# ENV WANDB_API_KEY ${WANDB_API_KEY}
+# RUN wandb login $(gcloud secrets versions access 1 --secret="wandb_api_key")
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]

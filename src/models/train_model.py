@@ -63,6 +63,13 @@ def get_args():
         metavar='LB',
         help='Limit train batches')
     
+    parser.add_argument(
+        '--wandb_key',
+        type=str,
+        default=None,
+        metavar='KEY',
+        help='API key for wandb')
+    
     args = parser.parse_args()
     return args
 
@@ -137,6 +144,9 @@ if __name__ == "__main__":
 
     args = get_args()
     # pdb.set_trace()
+    if args.wandb_key is not None:
+        login_cmd = "wandb login {api_key}".format(api_key=args.wandb_key)
+        os.system(login_cmd)
     # Define data/train/test/images map paths
     destination_path = os.path.abspath(os.path.join(os.getcwd(),'data'))
     train_label_map_path = os.path.join(destination_path, 'processed', 'train.csv')

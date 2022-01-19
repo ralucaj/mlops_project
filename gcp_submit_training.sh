@@ -16,5 +16,5 @@ gcloud ai-platform jobs submit training $JOB_NAME \
   -- \
   --lr=0.02 \
   --batch_size=64 \
-  --epochs=10 \
+  --epochs=1 \
   --seed=32
