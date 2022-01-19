@@ -24,3 +24,5 @@ snakeviz
 torch_tb_profiler
 pytest
 wandb
+torchserve
+torch-model-archiver

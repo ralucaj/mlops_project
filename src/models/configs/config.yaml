@@ -9,5 +9,8 @@ model:
   embed_dim: 128
   num_heads: 3
   num_classes: 2
-  model_path: "trained_model"
+  model_name: "trained_model"
+  quantized_model_name: "quantized_model"
+  deployable_model_name: "deployable_model"
+  num_workers: 8
   

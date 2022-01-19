@@ -12,7 +12,6 @@ apt clean && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt /root/requirements.txt
 COPY setup.py /root/setup.py
 COPY src/ /root/src/
-COPY wandb_login.sh /root/wandb_login.sh
 
 # Install requirements
 RUN pip install -r requirements.txt --no-cache-dir
@@ -41,11 +40,10 @@ RUN echo '[GoogleCompute]\nservice_account = default' > /etc/boto.cfg
 RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models
+RUN mkdir /root/models/trained_models
+RUN mkdir /root/models/quantized_models
+RUN mkdir /root/models/deployable_models
 RUN mkdir /root/data
-
-# ARG WANDB_API_KEY
-# ENV WANDB_API_KEY ${WANDB_API_KEY}
-# RUN wandb login $(gcloud secrets versions access 1 --secret="wandb_api_key")
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]

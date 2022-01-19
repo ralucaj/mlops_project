@@ -1,12 +1,12 @@
+import logging
+import os
+import pdb
+
+import hydra
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
-
-from visual_transformer_model import VisualTransformer
-from torch import nn, optim
-import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pdb
@@ -18,6 +18,9 @@ from pytorch_lightning.loggers import WandbLogger
 import logging
 import os
 import time
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from visual_transformer_model import VisualTransformer
 
 log = logging.getLogger(__name__)
 from src.data.isic import ISIC
@@ -45,7 +48,7 @@ def get_args():
     parser.add_argument(
         '--epochs',
         type=int,
-        default=10,
+        default=1,
         metavar='N',
         help='Number of epoch to train')
 
@@ -106,8 +109,15 @@ def train(cfg, args):
     )
     
     # Create train/validation dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
-    validation_loader = DataLoader(valid_dataset, batch_size=args.batch_size)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        num_workers=cfg.model.num_workers
+    )
+    validation_loader = DataLoader(
+        valid_dataset,
+        batch_size=args.batch_size,
+    )
 
     # Initialize early stopping
     early_stopping_callback = EarlyStopping(
@@ -129,45 +139,69 @@ def train(cfg, args):
         model, train_dataloaders=train_loader, val_dataloaders=validation_loader
     )
 
-    model_name = cfg.model.model_path + '_' + experiment_time + '.pt'
-    model_path_docker = os.path.join(models_dir_path, model_name)
-    print("Model path docker: {0}".format(model_path_docker))
+    model_name = cfg.model.model_name + '_' + experiment_time + '.pt'
+    model_path_local = os.path.join(models_dir_path, model_name)
+    print("Model path docker: {0}".format(model_path_local))
     # Save trained model
-    torch.save(model.state_dict(), model_path_docker)
+    torch.save(model.state_dict(), model_path_local)
 
     bucket_name = 'gs://melanoma-classification-models'
     model_path_bucket = os.path.join(bucket_name, 'trained_models', model_name)
-    subprocess.check_call(['gsutil', 'cp', model_path_docker, model_path_bucket])
+    subprocess.check_call(['gsutil', 'cp', model_path_local, model_path_bucket])
+
+    # Save deployable model
+    script_model = torch.jit.trace(
+        model,
+        torch.rand(1, 3, cfg.model.image_size, cfg.model.image_size)
+    )
+    deployable_model_name = cfg.model.deployable_model_name + '_' + experiment_time + '.pt'
+    deployable_model_path_local = os.path.join(deployable_model_dir_path, deployable_model_name)
+    script_model.save(deployable_model_path_local)
+    deployable_model_path_bucket = os.path.join(bucket_name, 'deployable_models', deployable_model_name)
+    subprocess.check_call(['gsutil', 'cp', deployable_model_path_local, deployable_model_path_bucket])
+
+    # Save quantized model
+    model_int8 = torch.quantization.quantize_dynamic(model)
+    quantized_model_name = cfg.model.quantized_model_name + '_' + experiment_time + '.pt'
+    quantized_model_path_local = os.path.join(quantized_model_dir_path, quantized_model_name)
+    torch.save(model_int8.state_dict(), quantized_model_path_local)
+    quantized_model_path_bucket = os.path.join(bucket_name, 'quantized_models', quantized_model_name)
+    subprocess.check_call(['gsutil', 'cp', quantized_model_path_local, quantized_model_path_bucket])
 
 
 if __name__ == "__main__":
-
+    # Getting input arguments
     args = get_args()
-    # pdb.set_trace()
+
+    # wandb login
     if args.wandb_key is not None:
         login_cmd = "wandb login {api_key}".format(api_key=args.wandb_key)
         os.system(login_cmd)
+
     # Define data/train/test/images map paths
     destination_path = os.path.abspath(os.path.join(os.getcwd(),'data'))
     train_label_map_path = os.path.join(destination_path, 'processed', 'train.csv')
     valid_label_map_path = os.path.join(destination_path, 'processed', 'valid.csv')
     image_dir = os.path.join(destination_path,'processed', 'images')
-    models_dir_path = os.path.abspath(os.path.join(os.getcwd(),'models'))
+    models_dir_path = os.path.abspath(os.path.join(os.getcwd(),'models', 'trained_models'))
+    deployable_model_dir_path = os.path.abspath(os.path.join(os.getcwd(), 'models', 'deployable_models'))
+    quantized_model_dir_path = os.path.abspath(os.path.join(os.getcwd(),'models','quantized_models'))
     config_path = os.path.abspath(os.path.join(os.getcwd(), 'src', 'models', 'configs', 'config.yaml'))
     experiment_time = time.strftime("%Y%m%d-%H%M%S")
 
     # Google Cloud bucket name 
     bucket_name = 'gs://raw-dataset/processed'
 
+    # Copying data from cloud storage
     if not os.listdir(destination_path):
         print("Data directory empty, downloading the data...")
-        # Download data from cloud storage bucket
         command = "gsutil -m cp -r {bucketname} {localpath}".format(bucketname = bucket_name, localpath = destination_path)
         os.system(command)
-        #print(os.listdir(os.path.join(destination_path, 'processed')))
     else:
         print("Data already stored.")
 
+    # Loading configuration file
     cfg = OmegaConf.load(config_path)
+
     # Train model
     train(cfg, args)

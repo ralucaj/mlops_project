@@ -1,9 +1,11 @@
 import os
-import torch.nn.functional as F
-from torch import nn, optim
-from pytorch_lightning import LightningModule
+
 import kornia as K
-from torch.profiler import profile, record_function, ProfilerActivity, tensorboard_trace_handler
+import torch.nn.functional as F
+from pytorch_lightning import LightningModule
+from torch import nn, optim
+from torch.profiler import (ProfilerActivity, profile, record_function,
+                            tensorboard_trace_handler)
 
 
 class VisualTransformer(LightningModule):

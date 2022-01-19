@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import click
 import logging
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
-import pandas as pd
-import shutil
 import os
-import numpy as np
-import zipfile
 import pdb
+import shutil
+import zipfile
+from pathlib import Path
+
+import click
+import numpy as np
+import pandas as pd
+from dotenv import find_dotenv, load_dotenv
 
 
 @click.command()
@@ -19,7 +20,7 @@ def main(kaggle_dataset, input_filepath, output_filepath):
     """
         Prepares the datasets. Download and process raw data from
         (./data/raw) into cleaned ready preprocessed (.data/processed).
-        
+
     Args:
         kaggle_dataset (string): kaggle dataset id, in the format [UserName/DatasetName]
         input_filepath (string): location where the raw data is stored
@@ -27,12 +28,20 @@ def main(kaggle_dataset, input_filepath, output_filepath):
     """
     logger = logging.getLogger(__name__)
     # Check and create directories if missing
-    input_filepath_full = os.path.abspath(os.path.join(os.getcwd(), input_filepath.split('/')[0], input_filepath.split('/')[1])) 
+    input_filepath_full = os.path.abspath(
+        os.path.join(
+            os.getcwd(), input_filepath.split("/")[0], input_filepath.split("/")[1]
+        )
+    )
     if not os.path.exists(input_filepath_full):
         logger.info(f"Path {input_filepath} not found, creating it now")
         os.makedirs(input_filepath_full)
-    
-    output_filepath_full = os.path.abspath(os.path.join(os.getcwd(), output_filepath.split('/')[0], output_filepath.split('/')[1])) 
+
+    output_filepath_full = os.path.abspath(
+        os.path.join(
+            os.getcwd(), output_filepath.split("/")[0], output_filepath.split("/")[1]
+        )
+    )
     if not os.path.exists(output_filepath_full):
         logger.info(f"Path {output_filepath} not found, creating it now")
         os.makedirs(output_filepath_full)
