@@ -83,7 +83,7 @@ def train(cfg, args):
     print("Training day and night")
 
     # Create wandb logger for Pytorch Lightning
-    wandb_logger = WandbLogger()
+    wandb_logger = WandbLogger(project="melanoma-classification")
 
     # Specify model
     model = VisualTransformer(cfg.model, args.lr)
