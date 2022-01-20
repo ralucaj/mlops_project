@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import base64
 
 import torch
 from PIL import Image
@@ -19,14 +20,23 @@ def model_handler(data, context):
     torch-model-archiver --model-name transformer_model --version 1.0 \
             --model-file src/models/visual_transformer_model.py \
             --serialized-file=model_store/deployable_model.pt \
-            --handler=src/models/model_handler:model_handler
+            --handler=src/models/model_handler:model_handler \
+            --export-path=model_store -f
 
     Example torchserve:
     torchserve --start --ncs --model-store model_store \
             --models transformer_model=transformer_model.mar
 
     Example request:
-     curl http://127.0.0.1:8080/predictions/transformer_model -T reports/figures/isic.jpg
+cat > instances.json <<END
+{
+     "image": "$(base64 --wrap=0 reports/figures/isic.jpg)"
+}
+END
+     curl -X POST \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d @instances.json\
+   http://127.0.0.1:8080/predictions/transformer_model
 
 
     :param data: Input data for prediction
@@ -50,13 +60,15 @@ def model_handler(data, context):
 
         model = torch.jit.load(model_pt_path)
     else:
+        print(data)
         # Read bytes array as PIL image
-        data = Image.open(io.BytesIO(data[0]['body']))
+        decoded_image = base64.b64decode(data[0]['body']['image'])
+        image = Image.open(io.BytesIO(decoded_image))
         # Transform PIL image to tensor
-        data = transforms.ToTensor()(data)
+        image = transforms.ToTensor()(image)
         # Resize to 512 x 512
-        data = transforms.Resize((512, 512))(data)
-        data = torch.unsqueeze(data, 0)
+        image = transforms.Resize((512, 512))(image)
+        image = torch.unsqueeze(image, 0)
         #infer and return result
-        pred = model(data).cpu().detach()[0].argmax().item()
+        pred = model(image).cpu().detach()[0].argmax().item()
         return [pred]
