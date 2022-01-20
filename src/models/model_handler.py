@@ -27,16 +27,18 @@ def model_handler(data, context):
     torchserve --start --ncs --model-store model_store \
             --models transformer_model=transformer_model.mar
 
-    Example request:
+    Create request file:
 cat > instances.json <<END
 {
      "image": "$(base64 --wrap=0 reports/figures/isic.jpg)"
 }
 END
+
+    Request a prediction from the server:
      curl -X POST \
-  -H "Content-Type: application/json; charset=utf-8" \
-  -d @instances.json\
-   http://127.0.0.1:8080/predictions/transformer_model
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d @instances.json\
+     http://127.0.0.1:8080/predictions/transformer_model
 
 
     :param data: Input data for prediction
@@ -60,7 +62,6 @@ END
 
         model = torch.jit.load(model_pt_path)
     else:
-        print(data)
         # Read bytes array as PIL image
         decoded_image = base64.b64decode(data[0]['body']['image'])
         image = Image.open(io.BytesIO(decoded_image))
