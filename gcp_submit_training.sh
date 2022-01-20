@@ -16,9 +16,9 @@ gcloud ai-platform jobs submit training $JOB_NAME \
   --region $REGION \
   --master-image-uri $IMAGE_URI \
   -- \
-  --lr=0.02 \
-  --batch_size=64 \
-  --epochs=1 \
-  --seed=32 \
+  --lr=0.001 \
+  --batch_size=32 \
+  --epochs=20 \
+  --seed=30 \
   --wandb_key=$WANDB_KEY
 
