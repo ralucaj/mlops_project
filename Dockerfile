@@ -12,13 +12,10 @@ apt clean && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt /root/requirements.txt
 COPY setup.py /root/setup.py
 COPY src/ /root/src/
-COPY .dvc/ /root/.dvc/
-COPY data/processed.dvc /root/data/processed.dvc
 
 # Install requirements
 RUN pip install -r requirements.txt --no-cache-dir
-RUN pip install dvc
-RUN pip install dvc[gs]
+RUN pip install --upgrade google-cloud-storage
 
 # Installs google cloud sdk, this is mostly for using gsutil to export model.
 RUN wget -nv \
@@ -39,12 +36,14 @@ ENV PATH $PATH:/root/tools/google-cloud-sdk/bin
 # Make sure gsutil will use the default service account
 RUN echo '[GoogleCompute]\nservice_account = default' > /etc/boto.cfg
 
-# create data folder?
-# pull data from the cloud
-RUN dvc pull
+# create folders
 RUN mkdir /root/reports
 RUN mkdir /root/reports/figures
 RUN mkdir /root/models
+RUN mkdir /root/models/trained_models
+RUN mkdir /root/models/quantized_models
+RUN mkdir /root/models/deployable_models
+RUN mkdir /root/data
 
 # Define the application to run when the image is executed
 ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
