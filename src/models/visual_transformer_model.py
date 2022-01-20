@@ -9,13 +9,14 @@ from torch.profiler import (ProfilerActivity, profile, record_function,
 
 
 class VisualTransformer(LightningModule):
-    def __init__(self, cfg):
+    def __init__(self, cfg, lr):
         super().__init__()
         self.image_size = cfg.image_size
         self.patch_size = cfg.patch_size
         self.embed_dim = cfg.embed_dim
         self.num_heads = cfg.num_heads
         self.num_classes = cfg.num_classes
+        self.lr = lr
 
         self.vision_transformer = K.contrib.VisionTransformer(
             image_size=self.image_size,
@@ -31,7 +32,7 @@ class VisualTransformer(LightningModule):
         )
 
         self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.parameters(), lr=cfg.lr)
+        self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
 
     def forward(self, x):
         # make sure input tensor is flattened

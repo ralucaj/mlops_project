@@ -1,5 +1,11 @@
-steps:
+steps: 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/mlops-project-skin-cancer/training_images', '.']
+  args: ['build', '--build-arg', 'WANDB_API_KEY=$$API_KEY', '-t', 'gcr.io/mlops-project-skin-cancer/training_images', '.']
+  secretEnv: ['API_KEY']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/mlops-project-skin-cancer/training_images']
+availableSecrets:
+  secretManager:
+  - versionName: projects/930242232300/secrets/wandb_api_key/versions/2
+    env: 'API_KEY'
+timeout: '1600s'

@@ -11,13 +11,13 @@ class model_config_attributes:
   embed_dim = 128
   num_heads = 3
   num_classes = 2
-  lr = 1e-3
+  
 
    
 def test_model_dimensions():
-    
+    lr = 1e-3
     input_data = torch.randn(1, 3, 512, 512)
-    model = VisualTransformer(model_config_attributes)
+    model = VisualTransformer(model_config_attributes, lr)
     output = model(input_data)
     
     assert list(output[0].shape) == [2], "The model's output should be 2D."

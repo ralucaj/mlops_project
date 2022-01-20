@@ -94,3 +94,9 @@ models/
 
 # Profiler
 *.prof
+
+#Logs
+lightning_logs/
+
+/wandb
+/None
