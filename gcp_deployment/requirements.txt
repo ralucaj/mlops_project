@@ -1,0 +1,9 @@
+# external requirements
+torch==1.10.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+torchvision==0.11.2+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+pytorch_lightning
+kornia
+hydra
+hydra-core
+torchserve
+google-cloud-storage

@@ -1,33 +1,120 @@
 from google.cloud import storage
 import os
 
-def run_model(models_bucket_name, test_image_bucket_name, test_image_dir, model_dir):
-    """Downloads a blob from the bucket."""
-    # The ID of your GCS bucket
-    # bucket_name = "your-bucket-name"
+import kornia as K
+import torch.nn.functional as F
+from pytorch_lightning import LightningModule
+from torch import nn, optim
+import torch
+from PIL import Image
+from torchvision import transforms as T
 
-    # The ID of your GCS object
-    # source_blob_name = "storage-object-name"
 
-    # The path to which the file should be downloaded
-    # destination_file_name = "local/path/to/file"
 
-    storage_client = storage.Client()
+class model_config_attributes:
+  image_size = 512
+  patch_size = 64
+  embed_dim = 128
+  num_heads = 3
+  num_classes = 2
+  lr = 1e-3
 
-    bucket = storage_client.bucket(bucket_name)
 
-    # Construct a client side representation of a blob.
-    # Note `Bucket.blob` differs from `Bucket.get_blob` as it doesn't retrieve
-    # any content from Google Cloud Storage. As we don't need additional data,
-    # using `Bucket.blob` is preferred here.
-    blob = bucket.blob(source_blob_name)
-    blob.download_to_filename(destination_file_name)
+class VisualTransformer(LightningModule):
+    def __init__(self, cfg):
+        super().__init__()
+        self.image_size = cfg.image_size
+        self.patch_size = cfg.patch_size
+        self.embed_dim = cfg.embed_dim
+        self.num_heads = cfg.num_heads
+        self.num_classes = cfg.num_classes
 
-    print(
-        "Downloaded storage object {} from bucket {} to local file {}.".format(
-            source_blob_name, bucket_name, destination_file_name
+        self.vision_transformer = K.contrib.VisionTransformer(
+            image_size=self.image_size,
+            patch_size=self.patch_size,
+            embed_dim=self.embed_dim,
+            num_heads=self.num_heads,
         )
-    )
+        self.classification_head = K.contrib.ClassificationHead(
+            embed_size=self.embed_dim, num_classes=self.num_classes
+        )
+        self.classifier = nn.Sequential(
+            self.vision_transformer, self.classification_head
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = optim.Adam(self.parameters(), lr=cfg.lr)
+
+    def forward(self, x):
+        # make sure input tensor is flattened
+        x = self.classifier(x)
+        return x
+
+    def training_step(self, batch, batch_idx):
+        """
+        Perform a training iteration.
+
+        Args:
+            batch (tensor): input data batch of size [batch_size, 512, 512]
+            batch_idx ([type]): [description]
+
+        Returns:
+            loss (tensor): array of losses for the particular input batch
+        """
+        data, target = batch
+        preds = self.forward(data)
+        loss = self.criterion(preds, target)
+        self.log("loss", loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        """
+        Perform a validation iteration.
+
+        Args:
+            batch (tensor): input data batch of size [batch_size, 512, 512]
+            batch_idx ([type]): [description]
+
+        Returns:
+            loss (tensor): array of losses for the particular input batch
+        """
+        data, target = batch
+        preds = self.forward(data)
+        loss = self.criterion(preds, target)
+        self.log("valid_loss", loss)
+        return loss
+
+    def configure_optimizers(self):
+        return self.optimizer
+
+
+def run_model(models_bucket_name, test_image_bucket_name, test_image_dir, model_dir):
+
+    ## Load pre-trained model
+    storage_client_model = storage.Client()
+    model_bucket = storage_client_model.bucket(models_bucket_name)
+    blob_model = model_bucket.get_blob(model_dir)
+    
+    model = VisualTransformer(model_config_attributes)
+    model.state_dict(blob_model.download_as_string())
+    model.eval()
+    
+    ## Load test image
+    storage_client_image = storage.Client()
+    image_bucket = storage_client_image.bucket(test_image_bucket_name)
+    blob_image = image_bucket.get_blob(test_image_dir)
+    
+    test_image_as_pil = Image.open(blob_image.download_as_string())
+    test_image = T.ToTensor()(test_image_as_pil)
+    test_image = T.Resize((512, 512))(test_image)
+    test_image = torch.unsqueeze(test_image, 0)
+    
+    ## Predict
+    pred = model(test_image).cpu().detach()[0].argmax().item()
+    
+    ## Print Result
+    print('The model prediction is: '.format(pred))
+
 
 if __name__ == "__main__":
     models_bucket_name = 'gs://melanoma-classification-models/'
