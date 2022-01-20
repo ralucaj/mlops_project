@@ -1,0 +1,9 @@
+{
+    "instances": [
+        {
+        "data":  {
+            "b64": "$(base64 --wrap=0 data/raw/test/ISIC_0052060.jpg)"
+        }
+        }
+    ]
+}
