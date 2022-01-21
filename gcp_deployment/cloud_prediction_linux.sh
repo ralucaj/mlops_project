@@ -19,3 +19,5 @@ curl -X POST \
 	-H "Content-Type: application/json; charset=utf-8" \
 	-d @instances.json \
 	https://us-central1-ml.googleapis.com/v1/projects/mlops-project-skin-cancer/models/docker_deployed_model/versions/v10:predict
+
+  printf "\n"
