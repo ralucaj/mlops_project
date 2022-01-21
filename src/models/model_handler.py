@@ -27,10 +27,27 @@ def model_handler(data, context):
     torchserve --start --ncs --model-store model_store \
             --models transformer_model=transformer_model.mar
 
-    Create request file:
+    Create request file (Linux):
 cat > instances.json <<END
 {
-     "image": "$(base64 --wrap=0 reports/figures/isic.jpg)"
+    "instances": [
+      {
+        "data": {
+            "image": "$(base64 --wrap=0 reports/figures/isic.jpg)"
+        }
+    }]
+}
+END
+
+    Create request file (macOs):
+cat > instances.json <<END
+{
+    "instances": [
+      {
+        "data": {
+            "image": "$(base64 reports/figures/isic.jpg)"
+        }
+    }]
 }
 END
 
@@ -63,7 +80,8 @@ END
         model = torch.jit.load(model_pt_path)
     else:
         # Read bytes array as PIL image
-        decoded_image = base64.b64decode(data[0]['body']['image'])
+        # print(data) 
+        decoded_image = base64.b64decode(data[0]['data']['image'])
         image = Image.open(io.BytesIO(decoded_image))
         # Transform PIL image to tensor
         image = transforms.ToTensor()(image)
