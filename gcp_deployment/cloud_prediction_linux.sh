@@ -20,4 +20,4 @@ curl -X POST \
 	-d @instances.json \
 	https://us-central1-ml.googleapis.com/v1/projects/mlops-project-skin-cancer/models/docker_deployed_model/versions/v10:predict
 
-  printf "\n"
+printf "\n"
